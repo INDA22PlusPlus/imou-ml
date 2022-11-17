@@ -1,15 +1,28 @@
+import numpy as np
+
+from ML.mnist import MNISTParser
 from ML.layer import InputLayer, Layer, OutputLayer
 from ML.model import Model
 
+
 if __name__ == '__main__':
-    a = InputLayer(10)
-    b = Layer(20)
-    c = OutputLayer(3)
+    # Load all the files to the parser
+    parser = MNISTParser('mnist/train-labels.idx1-ubyte',
+                         'mnist/train-images.idx3-ubyte',
+                         'mnist/t10k-labels.idx1-ubyte',
+                         'mnist/t10k-images.idx3-ubyte')
 
-    model = Model([a,b,c])
-    model.h5dump('test.h5')
+    a = InputLayer(28*28)
+    b = Layer(256, activation='sigmoid')
+    c = OutputLayer(10, activation='softmax')
 
-    model2 = Model(None)
-    model2.h5load('test.h5')
+    model = Model([a,b,c], seed=22)
+    try:
+        model.train(0.1, 0.7, 500, parser, batch=128, verbose=True)
+    except KeyboardInterrupt:
+        model.dump('m.json', 'm.h5')
+    print(model.accuracy(parser))
 
-    print(model2.layers)
+    model2 = Model([])
+    model2.load('m.json', 'm.h5')
+    print(model2.accuracy(parser))
