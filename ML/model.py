@@ -128,6 +128,26 @@ class Model:
             if verbose:
                 print(f"Epoch {epoch} is completed | Cost: {cost(Y,self._layers[-1].A)}")
 
+    def autoencoder_train(self, learning_rate: float, mu: float, epochs: int, parser: MNISTParser,
+                batch: int = 128, verbose: bool = False) -> None:
+        Y = None
+        for epoch in range(0, epochs):
+            for i in range(0, int(60000/batch)):
+                rand_inds = np.random.permutation(np.arange(batch))
+                Y = np.empty((28*28, batch))
+                lls = []
+                for k,j in enumerate(rand_inds):
+                    Y[:,k] = parser.get_train_image(i*batch+j)
+                    lls.append(parser.get_train_label(i*batch+j))
+
+                X = np.eye(10)[lls]
+                X = X.T
+
+                self._backprop(X, Y, learning_rate, mu)
+
+            if verbose:
+                print(f"Epoch {epoch} is completed | Cost: {cost(Y, self._layers[-1].A)}")
+
     # Calculate the accuracy of the model by using
     # the test data
     def accuracy(self, parser: MNISTParser) -> float:

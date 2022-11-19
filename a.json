@@ -1,0 +1,1 @@
+{"0": {"fn_type": "sigmoid", "neurons": 512}, "1": {"fn_type": "sigmoid", "neurons": 784}}
